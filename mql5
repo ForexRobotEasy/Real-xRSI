@@ -1,0 +1,75 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                            Real xRSI Indicator.mq5|
+//|                                 Copyright © 2023, Forex Robot Easy Team|
+//|                                          https://www.forexroboteasy.com|
+//+------------------------------------------------------------------+
+#property copyright 'Copyright © 2023, Forex Robot Easy Team'
+#property link      'https://www.forexroboteasy.com'
+
+// Indicator input parameters
+input int RSI_Period = 14;
+input int MA_Period = 20;
+input ENUM_APPLIED_PRICE MA_Price = PRICE_CLOSE;
+input int HeikenAshi_Period = 10;
+
+// Indicator buffers
+double RSI_Buffer[];
+double MA_Buffer[];
+double HeikenAshi_Buffer[];
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Set indicator buffers
+    SetIndicatorBuffers(1);
+    SetIndexBuffer(0, RSI_Buffer, INDICATOR_DATA);
+
+    SetIndicatorBuffers(2);
+    SetIndexBuffer(1, MA_Buffer, INDICATOR_CALCULATIONS);
+
+    SetIndicatorBuffers(3);
+    SetIndexBuffer(2, HeikenAshi_Buffer, INDICATOR_CALCULATIONS);
+
+    // Set indicator parameters
+    SetIndexStyle(0, DRAW_LINE);
+    SetIndexLabel(0, 'Real xRSI');
+
+    SetIndexStyle(1, DRAW_LINE);
+    SetIndexLabel(1, 'Moving Average');
+
+    SetIndexStyle(2, DRAW_LINE);
+    SetIndexLabel(2, 'Heiken-Ashi');
+
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+    // Calculate RSI
+    int rsi_calculated = iRSI(_Symbol, _Period, RSI_Period, PRICE_CLOSE, RSI_Buffer);
+
+    // Calculate Moving Average
+    int ma_calculated = iMA(_Symbol, _Period, MA_Period, 0, MA_Mode, MA_Price, MA_Buffer);
+
+    // Calculate Heiken-Ashi
+    int ha_calculated = iCustom(_Symbol, _Period, 'Heiken Ashi', HeikenAshi_Period, 0, HeikenAshi_Buffer);
+
+    // Some additional calculations or trading logic here
+
+    return(rates_total);
+}
